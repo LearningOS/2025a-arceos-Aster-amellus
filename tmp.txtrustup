@@ -1,0 +1,21 @@
+    [92;1mCreating[0m FAT32 disk image "disk.img" ...
+mkfs.fat 4.2 (2021-01-31)
+    [92;1mBuilding[0m App: print_with_color, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
+[37mcargo -C exercises/print_with_color/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
+Has color
+No Hello, Arceos!
+print_with_color fault
+    [92;1mCreating[0m FAT32 disk image "disk.img" ...
+mkfs.fat 4.2 (2021-01-31)
+    [92;1mBuilding[0m App: ramfs_rename, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
+[37mcargo -C exercises/ramfs_rename/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
+ramfs_rename fault
+    [92;1mCreating[0m FAT32 disk image "disk.img" ...
+mkfs.fat 4.2 (2021-01-31)
+    [92;1mBuilding[0m App: alt_alloc, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
+[37mcargo -C exercises/alt_alloc/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
+alt_alloc default
+    [92;1mCreating[0m FAT32 disk image "disk.img" ...
+mkfs.fat 4.2 (2021-01-31)
+    [92;1mBuilding[0m App: support_hashmap, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
+[37mcargo -C exercises/support_hashmap/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
