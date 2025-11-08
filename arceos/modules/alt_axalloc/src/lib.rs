@@ -10,13 +10,12 @@ use core::alloc::{GlobalAlloc, Layout};
 use core::ptr::NonNull;
 use kspin::SpinNoIrq;
 
-const PAGE_SIZE: usize = 0x1000;
+const HEAP_SIZE: usize = 96 * 1024 * 1024; // 32 MiB 静态缓冲区
 
-/// The global allocator used by ArceOS.
 pub struct GlobalAllocator {
-    inner: SpinNoIrq<EarlyAllocator<PAGE_SIZE>>,
+    inner: SpinNoIrq<EarlyAllocator<HEAP_SIZE>>,
 }
-
+ 
 impl GlobalAllocator {
     /// Creates an empty [`GlobalAllocator`].
     pub const fn new() -> Self {

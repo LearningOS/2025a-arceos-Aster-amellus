@@ -129,7 +129,7 @@ impl<const SIZE: usize> ByteAllocator for EarlyAllocator<SIZE> {
 }
 
 impl<const SIZE: usize> PageAllocator for EarlyAllocator<SIZE> {
-    const PAGE_SIZE: usize = SIZE;
+    const PAGE_SIZE: usize = Self::PAGE_SIZE;
 
     fn alloc_pages(
         &mut self,
@@ -169,7 +169,28 @@ impl<const SIZE: usize> PageAllocator for EarlyAllocator<SIZE> {
     }
 
     fn dealloc_pages(&mut self, pos: usize, num_pages: usize) {
-       //
+       if num_pages == 0 {
+        return;
+       }
+
+       let total_size = match num_pages.checked_mul(Self::PAGE_SIZE) {
+            Some(sz) => sz,
+            None => return,
+       };
+
+       let arena_base = self.arena.as_ptr() as usize;
+       let arena_end = arena_base + SIZE;
+
+       if pos < arena_base || pos + total_size > arena_end {
+           return;
+       }
+
+       let offset = pos - arena_base;
+       if offset == self.p_pos {
+           let new_pos = offset.saturating_add(total_size);
+           self.p_pos = core::cmp::min(new_pos, self.p_end);
+       }
+
     }
 
     fn total_pages(&self) -> usize {

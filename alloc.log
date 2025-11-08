@@ -68,6 +68,6 @@ build_mode = release
 log_level = warn
 
 Running bump tests...
-[37m[  0.082644 0 axruntime::lang_items:5] [31mpanicked at alloc/src/alloc.rs:419:13:
+[37m[  0.081850 0 axruntime::lang_items:5] [31mpanicked at alloc/src/alloc.rs:419:13:
 memory allocation of 24000000 bytes failed[m
 [malt_alloc default
