@@ -142,8 +142,8 @@ log_level = warn
 
 Create '/tmp/f1' and write [hello] ...
 Rename '/tmp/f1' to '/tmp/f2' ...
-[37m[  0.569850 0 axfs_vfs:160] [33m[AxError::Unsupported][m
-[m[37m[  0.573886 0 axruntime::lang_items:5] [31mpanicked at exercises/ramfs_rename/src/main.rs:51:9:
+[37m[  0.570461 0 axfs_vfs:160] [33m[AxError::Unsupported][m
+[m[37m[  0.574398 0 axruntime::lang_items:5] [31mpanicked at exercises/ramfs_rename/src/main.rs:51:9:
 Error: Operation not supported[m
 [mramfs_rename fault
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
@@ -216,9 +216,8 @@ build_mode = release
 log_level = warn
 
 Running bump tests...
-[37m[  0.081776 0 axruntime::lang_items:5] [31mpanicked at alloc/src/alloc.rs:419:13:
-memory allocation of 24000000 bytes failed[m
-[malt_alloc default
+Bump tests run OK!
+alt_alloc pass
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
 mkfs.fat 4.2 (2021-01-31)
     [92;1mBuilding[0m App: support_hashmap, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
@@ -233,10 +232,25 @@ make[2]: Nothing to be done for 'all'.
 make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/origin'
 make -C hello_c
 make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/hello_c'
-riscv64-linux-musl-gcc -static hello.c -o hello
+make[2]: Nothing to be done for 'all'.
 make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/hello_c'
+make -C fileops_c
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/fileops_c'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/fileops_c'
+make -C mapfile_c
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/mapfile_c'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/mapfile_c'
+make -C skernel
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel'
+make -C skernel2
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel2'
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel2'
 make[1]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload'
-File 'payload/mapfile_c/mapfile' doesn't exist!
+Write file 'payload/mapfile_c/mapfile' into disk.img
     [92;1mBuilding[0m App: sys_map, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
 [37mcargo -C exercises/sys_map/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
 [37mrust-objcopy --binary-architecture=riscv64[0m [90mexercises/sys_map//sys_map_riscv64-qemu-virt.elf --strip-all -O binary exercises/sys_map//sys_map_riscv64-qemu-virt.bin[0m
@@ -304,13 +318,39 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.619442 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.645071 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.672064 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.698188 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.718985 0:2 axruntime::lang_items:5] [31mpanicked at exercises/sys_map/src/main.rs:37:21:
-Cannot load app! NotFound[m
-[msys_mmap default
+[37m[  0.618253 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.642815 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.671610 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.696259 0 fatfs::dir:139] [31mIs a directory[m
+[mphdr: offset: 0x0=>0x0 size: 0x5FAC=>0x5FAC
+VA:0x0 - VA:0x6000
+phdr: offset: 0x6E70=>0x7E70 size: 0x340=>0x9B0
+VA:0x7000 - VA:0x9000
+entry: 0x526
+Mapping user stack: VA:0x3fffff0000 -> VA:0x4000000000
+New user address space: AddrSpace {
+    va_range: VA:0x0..VA:0x4000000000,
+    page_table_root: PA:0x8064d000,
+}
+handle_syscall [96] ...
+handle_syscall [29] ...
+Ignore SYS_IOCTL
+handle_syscall [66] ...
+MapFile ...
+handle_syscall [56] ...
+handle_syscall [64] ...
+handle_syscall [57] ...
+handle_syscall [56] ...
+handle_syscall [222] ...
+handle_syscall [66] ...
+Read back content: hello, arceos!
+handle_syscall [57] ...
+handle_syscall [66] ...
+MapFile ok!
+handle_syscall [94] ...
+[SYS_EXIT_GROUP]: system is exiting ..
+monolithic kernel exit [Some(0)] normally!
+sys_mmap pass
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
 mkfs.fat 4.2 (2021-01-31)
 make[1]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload'
@@ -320,10 +360,25 @@ make[2]: Nothing to be done for 'all'.
 make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/origin'
 make -C hello_c
 make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/hello_c'
-riscv64-linux-musl-gcc -static hello.c -o hello
+make[2]: Nothing to be done for 'all'.
 make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/hello_c'
+make -C fileops_c
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/fileops_c'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/fileops_c'
+make -C mapfile_c
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/mapfile_c'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/mapfile_c'
+make -C skernel
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel'
+make -C skernel2
+make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel2'
+make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/skernel2'
 make[1]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload'
-File 'payload/skernel2/skernel2' doesn't exist!
+Write file 'payload/skernel2/skernel2' into disk.img
     [92;1mBuilding[0m App: simple_hv, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
 [37mcargo -C exercises/simple_hv/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
 [37mrust-objcopy --binary-architecture=riscv64[0m [90mexercises/simple_hv//simple_hv_riscv64-qemu-virt.elf --strip-all -O binary exercises/simple_hv//simple_hv_riscv64-qemu-virt.bin[0m
@@ -391,13 +446,14 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.620226 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.645853 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.674445 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.700228 0 fatfs::dir:139] [31mIs a directory[m
+[37m[  0.623526 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.647931 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.675160 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.699914 0 fatfs::dir:139] [31mIs a directory[m
 [mHypervisor ...
 app: /sbin/skernel2
-[37m[  0.720816 0:2 axruntime::lang_items:5] [31mpanicked at exercises/simple_hv/src/main.rs:41:9:
-Cannot load app! NotFound[m
+paddr: PA:0x80643000
+[37m[  0.726319 0:2 axruntime::lang_items:5] [31mpanicked at exercises/simple_hv/src/main.rs:105:13:
+Bad instruction: 0xf14025f3 sepc: 0x80200000[m
 [msimple_hv default
-100
+300

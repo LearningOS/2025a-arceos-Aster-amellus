@@ -1,13 +1,16 @@
 #![allow(dead_code)]
 
-use core::ffi::{c_void, c_char, c_int};
+use alloc::vec::Vec;
+use core::ffi::{c_char, c_int, c_void};
+use axerrno::{AxError, LinuxError};
 use axhal::arch::TrapFrame;
+use axhal::mem::VirtAddr;
+use axhal::paging::MappingFlags;
 use axhal::trap::{register_trap_handler, SYSCALL};
-use axerrno::LinuxError;
+use arceos_posix_api as api;
 use axtask::current;
 use axtask::TaskExtRef;
-use axhal::paging::MappingFlags;
-use arceos_posix_api as api;
+use memory_addr::{VirtAddrRange, PAGE_SIZE_4K};
 
 const SYS_IOCTL: usize = 29;
 const SYS_OPENAT: usize = 56;
@@ -21,6 +24,8 @@ const SYS_SET_TID_ADDRESS: usize = 96;
 const SYS_MMAP: usize = 222;
 
 const AT_FDCWD: i32 = -100;
+const SEEK_SET: c_int = 0;
+const SEEK_CUR: c_int = 1;
 
 /// Macro to generate syscall body
 ///
@@ -100,7 +105,7 @@ bitflags::bitflags! {
 fn handle_syscall(tf: &TrapFrame, syscall_num: usize) -> isize {
     ax_println!("handle_syscall [{}] ...", syscall_num);
     let ret = match syscall_num {
-         SYS_IOCTL => sys_ioctl(tf.arg0() as _, tf.arg1() as _, tf.arg2() as _) as _,
+        SYS_IOCTL => sys_ioctl(tf.arg0() as _, tf.arg1() as _, tf.arg2() as _) as _,
         SYS_SET_TID_ADDRESS => sys_set_tid_address(tf.arg0() as _),
         SYS_OPENAT => sys_openat(tf.arg0() as _, tf.arg1() as _, tf.arg2() as _, tf.arg3() as _),
         SYS_CLOSE => sys_close(tf.arg0() as _),
@@ -131,7 +136,6 @@ fn handle_syscall(tf: &TrapFrame, syscall_num: usize) -> isize {
     ret
 }
 
-#[allow(unused_variables)]
 fn sys_mmap(
     addr: *mut usize,
     length: usize,
@@ -140,7 +144,104 @@ fn sys_mmap(
     fd: i32,
     _offset: isize,
 ) -> isize {
-    unimplemented!("no sys_mmap!");
+    syscall_body!(sys_mmap, {
+        // Align as 4 KiB, both length and offset can't be 0.
+        if length == 0 {
+            return Err(LinuxError::EINVAL);
+        }
+        if _offset < 0 {
+            return Err(LinuxError::EINVAL);
+        }
+
+        // Parse w/r bit in MmapProt and map it into MappingFlags
+        let prot_bits = MmapProt::from_bits(prot).ok_or(LinuxError::EINVAL)?;
+        let flag_bits = MmapFlags::from_bits(flags).ok_or(LinuxError::EINVAL)?;
+        if !flag_bits.contains(MmapFlags::MAP_ANONYMOUS) && fd < 0 { // In anomynous map, fd must le 0
+            return Err(LinuxError::EBADF);
+        }
+
+        let len_aligned = length
+            .checked_add(PAGE_SIZE_4K - 1)
+            .ok_or(LinuxError::ENOMEM)?
+            & !(PAGE_SIZE_4K - 1);
+        if len_aligned == 0 {
+            return Err(LinuxError::EINVAL);
+        }
+
+        let offset = _offset as usize;
+        if offset % PAGE_SIZE_4K != 0 {
+            return Err(LinuxError::EINVAL);
+        }
+
+        let mut map_flags: MappingFlags = prot_bits.into();
+        if !map_flags.contains(MappingFlags::USER) {
+            map_flags |= MappingFlags::USER;
+        }
+        let populate = !flag_bits.contains(MmapFlags::MAP_NORESERVE);
+
+        let curr = current();
+        let task_ext = curr.task_ext();
+        let mut aspace = task_ext.aspace.lock();
+
+        let base = aspace.base();
+        let limit = VirtAddrRange::from_start_size(base, aspace.size());
+        let req_addr = addr as usize;
+
+        let target = if flag_bits.contains(MmapFlags::MAP_FIXED) {
+            if addr.is_null() {
+                return Err(LinuxError::EINVAL);
+            }
+            if req_addr % PAGE_SIZE_4K != 0 {
+                return Err(LinuxError::EINVAL);
+            }
+            let vaddr = VirtAddr::from(req_addr);
+            if !aspace.contains_range(vaddr, len_aligned) {
+                return Err(LinuxError::EINVAL);
+            }
+            vaddr
+        } else {
+            let hint = if addr.is_null() {
+                base
+            } else {
+                VirtAddr::from(req_addr & !(PAGE_SIZE_4K - 1))
+            };
+            aspace
+                .find_free_area(hint, len_aligned, limit)
+                .or_else(|| {
+                    if hint != base {
+                        aspace.find_free_area(base, len_aligned, limit)
+                    } else {
+                        None
+                    }
+                })
+                .ok_or(LinuxError::ENOMEM)?
+        };
+
+        aspace
+            .map_alloc(target, len_aligned, map_flags, populate)
+            .map_err(ax_err_to_linux)?;
+
+        if !flag_bits.contains(MmapFlags::MAP_ANONYMOUS) {
+            let saved = syscall_ret_to_isize(api::sys_lseek(fd, 0, SEEK_CUR) as isize)?;
+            syscall_ret_to_isize(api::sys_lseek(fd, offset as _, SEEK_SET) as isize)?;
+
+            let mut buf: Vec<u8> = Vec::with_capacity(length);
+            buf.resize(length, 0);
+            let read_len = syscall_ret_to_isize(
+                api::sys_read(fd, buf.as_mut_ptr() as *mut c_void, length) as isize,
+            )? as usize;
+
+            if read_len > 0 {
+                aspace
+                    .write(target, &buf[..read_len])
+                    .map_err(ax_err_to_linux)?;
+            }
+
+            syscall_ret_to_isize(api::sys_lseek(fd, saved as _, SEEK_SET) as isize)?;
+        }
+
+        Ok(target.as_usize())
+    })
 }
 
 fn sys_openat(dfd: c_int, fname: *const c_char, flags: c_int, mode: api::ctypes::mode_t) -> isize {
@@ -173,4 +274,26 @@ fn sys_set_tid_address(tid_ptd: *const i32) -> isize {
 fn sys_ioctl(_fd: i32, _op: usize, _argp: *mut c_void) -> i32 {
     ax_println!("Ignore SYS_IOCTL");
     0
+}
+
+fn ax_err_to_linux(err: AxError) -> LinuxError {
+    match err {
+        AxError::NoMemory => LinuxError::ENOMEM,
+        AxError::InvalidInput | AxError::BadState => LinuxError::EINVAL,
+        AxError::BadAddress => LinuxError::EFAULT,
+        AxError::AlreadyExists => LinuxError::EEXIST,
+        AxError::NotFound => LinuxError::ENOENT,
+        AxError::PermissionDenied => LinuxError::EACCES,
+        AxError::WouldBlock => LinuxError::EAGAIN,
+        _ => LinuxError::EFAULT,
+    }
+}
+
+fn syscall_ret_to_isize(ret: isize) -> Result<isize, LinuxError> {
+    if ret < 0 {
+        let errno = (-ret) as i32;
+        Err(LinuxError::try_from(errno).unwrap_or(LinuxError::EINVAL))
+    } else {
+        Ok(ret)
+    }
 }
