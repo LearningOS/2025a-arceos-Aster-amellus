@@ -142,8 +142,8 @@ log_level = warn
 
 Create '/tmp/f1' and write [hello] ...
 Rename '/tmp/f1' to '/tmp/f2' ...
-[37m[  0.346125 0 axfs_vfs:160] [33m[AxError::Unsupported][m
-[m[37m[  0.348815 0 axruntime::lang_items:5] [31mpanicked at exercises/ramfs_rename/src/main.rs:51:9:
+[37m[  0.569850 0 axfs_vfs:160] [33m[AxError::Unsupported][m
+[m[37m[  0.573886 0 axruntime::lang_items:5] [31mpanicked at exercises/ramfs_rename/src/main.rs:51:9:
 Error: Operation not supported[m
 [mramfs_rename fault
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
@@ -215,8 +215,9 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.056151 0 axruntime::lang_items:5] [31mpanicked at /home/aster/os/2025a-arceos-Aster-amellus/arceos/modules/bump_allocator/src/lib.rs:29:9:
-not yet implemented[m
+Running bump tests...
+[37m[  0.081776 0 axruntime::lang_items:5] [31mpanicked at alloc/src/alloc.rs:419:13:
+memory allocation of 24000000 bytes failed[m
 [malt_alloc default
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
 mkfs.fat 4.2 (2021-01-31)
@@ -228,6 +229,7 @@ mkfs.fat 4.2 (2021-01-31)
 make[1]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload'
 make -C origin
 make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/origin'
+make[2]: Nothing to be done for 'all'.
 make[2]: Leaving directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/origin'
 make -C hello_c
 make[2]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload/hello_c'
@@ -302,11 +304,11 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.391005 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.412990 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.438146 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.463132 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.479415 0:2 axruntime::lang_items:5] [31mpanicked at exercises/sys_map/src/main.rs:37:21:
+[37m[  0.619442 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.645071 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.672064 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.698188 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.718985 0:2 axruntime::lang_items:5] [31mpanicked at exercises/sys_map/src/main.rs:37:21:
 Cannot load app! NotFound[m
 [msys_mmap default
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
@@ -389,13 +391,13 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.391074 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.412547 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.436750 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.460125 0 fatfs::dir:139] [31mIs a directory[m
+[37m[  0.620226 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.645853 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.674445 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.700228 0 fatfs::dir:139] [31mIs a directory[m
 [mHypervisor ...
 app: /sbin/skernel2
-[37m[  0.476034 0:2 axruntime::lang_items:5] [31mpanicked at exercises/simple_hv/src/main.rs:41:9:
+[37m[  0.720816 0:2 axruntime::lang_items:5] [31mpanicked at exercises/simple_hv/src/main.rs:41:9:
 Cannot load app! NotFound[m
 [msimple_hv default
 100
