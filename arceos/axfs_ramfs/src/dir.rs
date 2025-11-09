@@ -165,6 +165,64 @@ impl VfsNodeOps for DirNode {
         }
     }
 
+    fn rename(&self, src_path: &str, dst_path: &str) -> VfsResult {
+        log::debug!("rename at ramfs: {} -> {}", src_path, dst_path);
+        
+        // Split the source path
+        let (src_name, src_rest) = split_path(src_path);
+
+        // If source has more path components, recurse into subdirectories  
+        if src_rest.is_some() {
+            match src_name {
+                "" | "." => return self.rename(src_rest.unwrap(), dst_path),
+                ".." => return self.parent().ok_or(VfsError::NotFound)?.rename(src_rest.unwrap(), dst_path),
+                _ => {
+                    let subdir = self
+                        .children
+                        .read()
+                        .get(src_name)
+                        .ok_or(VfsError::NotFound)?
+                        .clone();
+                    return subdir.rename(src_rest.unwrap(), dst_path);
+                }
+            }
+        }
+
+        // At this point, src_name is the final component (the file to rename)
+        // Now extract the final component of dst_path
+        
+        // For dst_path, we need to extract just the filename
+        // It might be "/tmp/f2" or "f2" or "subdir/f2"
+        let dst_path = dst_path.trim_start_matches('/');
+        
+        // Find the last component of the destination path
+        let dst_name = if let Some(pos) = dst_path.rfind('/') {
+            &dst_path[pos + 1..]
+        } else {
+            dst_path
+        };
+        
+        // Simple rename in the same directory
+        // Check if source exists
+        if !self.exist(src_name) {
+            return Err(VfsError::NotFound);
+        }
+        
+        // Check if destination already exists
+        if self.exist(dst_name) {
+            return Err(VfsError::AlreadyExists);
+        }
+        
+        // Move the node from src to dst
+        let mut children = self.children.write();
+        if let Some(node) = children.remove(src_name) {
+            children.insert(dst_name.into(), node);
+            Ok(())
+        } else {
+            Err(VfsError::NotFound)
+        }
+    }
+
     axfs_vfs::impl_vfs_dir_default! {}
 }
 
