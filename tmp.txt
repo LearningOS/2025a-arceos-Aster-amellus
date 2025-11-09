@@ -142,10 +142,10 @@ log_level = warn
 
 Create '/tmp/f1' and write [hello] ...
 Rename '/tmp/f1' to '/tmp/f2' ...
-[37m[  0.570461 0 axfs_vfs:160] [33m[AxError::Unsupported][m
-[m[37m[  0.574398 0 axruntime::lang_items:5] [31mpanicked at exercises/ramfs_rename/src/main.rs:51:9:
-Error: Operation not supported[m
-[mramfs_rename fault
+Read '/tmp/f2' content: [hello] ok!
+
+[Ramfs-Rename]: ok!
+ramfs_rename pass
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
 mkfs.fat 4.2 (2021-01-31)
     [92;1mBuilding[0m App: alt_alloc, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
@@ -222,7 +222,75 @@ alt_alloc pass
 mkfs.fat 4.2 (2021-01-31)
     [92;1mBuilding[0m App: support_hashmap, Arch: riscv64, Platform: riscv64-qemu-virt, App type: rust
 [37mcargo -C exercises/support_hashmap/ build[0m [90m-Z unstable-options --target riscv64gc-unknown-none-elf --target-dir /home/aster/os/2025a-arceos-Aster-amellus/arceos/target --release  --features "axstd/log-level-warn"[0m
-support_hashmap default
+[37mrust-objcopy --binary-architecture=riscv64[0m [90mexercises/support_hashmap//support_hashmap_riscv64-qemu-virt.elf --strip-all -O binary exercises/support_hashmap//support_hashmap_riscv64-qemu-virt.bin[0m
+    [96;1mRunning[0m on qemu...
+[37mqemu-system-riscv64[0m [90m-m 128M -smp 1 -machine virt -bios default -kernel exercises/support_hashmap//support_hashmap_riscv64-qemu-virt.bin -drive if=pflash,file=/home/aster/os/2025a-arceos-Aster-amellus/arceos/pflash.img,format=raw,unit=1 -nographic -D qemu.log -d in_asm,int,mmu,pcall,cpu_reset,guest_errors[0m
+
+OpenSBI v1.0
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : riscv-virtio,qemu
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : aclint-mswi
+Platform Timer Device     : aclint-mtimer @ 10000000Hz
+Platform Console Device   : uart8250
+Platform HSM Device       : ---
+Platform Reboot Device    : sifive_test
+Platform Shutdown Device  : sifive_test
+Firmware Base             : 0x80000000
+Firmware Size             : 252 KB
+Runtime SBI Version       : 0.3
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000002000000-0x000000000200ffff (I)
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000087000000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART ISA             : rv64imafdcsuh
+Boot HART Features        : scounteren,mcounteren,time
+Boot HART PMP Count       : 16
+Boot HART PMP Granularity : 4
+Boot HART PMP Address Bits: 54
+Boot HART MHPM Count      : 0
+Boot HART MIDELEG         : 0x0000000000001666
+Boot HART MEDELEG         : 0x0000000000f0b509
+
+       d8888                            .d88888b.   .d8888b.
+      d88888                           d88P" "Y88b d88P  Y88b
+     d88P888                           888     888 Y88b.
+    d88P 888 888d888  .d8888b  .d88b.  888     888  "Y888b.
+   d88P  888 888P"   d88P"    d8P  Y8b 888     888     "Y88b.
+  d88P   888 888     888      88888888 888     888       "888
+ d8888888888 888     Y88b.    Y8b.     Y88b. .d88P Y88b  d88P
+d88P     888 888      "Y8888P  "Y8888   "Y88888P"   "Y8888P"
+
+arch = riscv64
+platform = riscv64-qemu-virt
+target = riscv64gc-unknown-none-elf
+smp = 1
+build_mode = release
+log_level = warn
+
+Running memory tests...
+test_hashmap() OK!
+Memory tests run OK!
+support_hashmap pass
     [92;1mCreating[0m FAT32 disk image "disk.img" ...
 mkfs.fat 4.2 (2021-01-31)
 make[1]: Entering directory '/home/aster/os/2025a-arceos-Aster-amellus/arceos/payload'
@@ -318,10 +386,10 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.618253 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.642815 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.671610 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.696259 0 fatfs::dir:139] [31mIs a directory[m
+[37m[  0.700681 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.730819 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.762756 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.792506 0 fatfs::dir:139] [31mIs a directory[m
 [mphdr: offset: 0x0=>0x0 size: 0x5FAC=>0x5FAC
 VA:0x0 - VA:0x6000
 phdr: offset: 0x6E70=>0x7E70 size: 0x340=>0x9B0
@@ -446,14 +514,19 @@ smp = 1
 build_mode = release
 log_level = warn
 
-[37m[  0.623526 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.647931 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.675160 0 fatfs::dir:139] [31mIs a directory[m
-[m[37m[  0.699914 0 fatfs::dir:139] [31mIs a directory[m
+[37m[  0.692640 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.720559 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.752739 0 fatfs::dir:139] [31mIs a directory[m
+[m[37m[  0.782944 0 fatfs::dir:139] [31mIs a directory[m
 [mHypervisor ...
 app: /sbin/skernel2
-paddr: PA:0x80643000
-[37m[  0.726319 0:2 axruntime::lang_items:5] [31mpanicked at exercises/simple_hv/src/main.rs:105:13:
-Bad instruction: 0xf14025f3 sepc: 0x80200000[m
-[msimple_hv default
-300
+paddr: PA:0x80644000
+Setup test data at address 0x40: 0x6688
+Emulated: csrr a1, mhartid -> 0x1234
+VmExit Reason: VSuperEcall: Some(Reset(Reset { reset_type: Shutdown, reason: NoReason }))
+a0 = 0x6688, a1 = 0x1234
+Shutdown vm normally!
+Hypervisor ok!
+[Simple-HV]: ok!
+simple_hv pass
+600

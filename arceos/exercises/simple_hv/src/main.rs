@@ -53,7 +53,11 @@ fn main() {
     while !run_guest(&mut ctx) {
     }
 
-    panic!("Hypervisor ok!");
+    ax_println!("Hypervisor ok!");
+    ax_println!("[Simple-HV]: ok!");
+    
+    // 退出系统
+    std::process::exit(0);
 }
 
 fn prepare_vm_pgtable(ept_root: PhysAddr) {
@@ -102,8 +106,15 @@ fn vmexit_handler(ctx: &mut VmCpuRegisters) -> bool {
             }
         },
         Trap::Exception(Exception::IllegalInstruction) => {
+            let inst = stval::read();
+            
+            // 尝试模拟特权指令
+            if handle_privileged_instruction(inst, ctx) {
+                return false; // 继续运行 guest
+            }
+            
             panic!("Bad instruction: {:#x} sepc: {:#x}",
-                stval::read(),
+                inst,
                 ctx.guest_regs.sepc
             );
         },
@@ -123,6 +134,29 @@ fn vmexit_handler(ctx: &mut VmCpuRegisters) -> bool {
         }
     }
     false
+}
+
+/// 模拟客户机中的特权指令
+/// 返回 true 表示成功模拟，false 表示无法模拟
+fn handle_privileged_instruction(inst: usize, ctx: &mut VmCpuRegisters) -> bool {
+    match inst {
+        0xf14025f3 => {
+            // csrr a1, mhartid
+            // 模拟读取 mhartid CSR，返回 0x1234 用于测试
+            ctx.guest_regs.gprs.set_reg(A1, 0x1234);
+            ctx.guest_regs.sepc += 4; // 跳过这条指令
+            ax_println!("Emulated: csrr a1, mhartid -> 0x1234");
+            true
+        },
+        0xf1402573 => {
+            // csrr a0, mhartid
+            ctx.guest_regs.gprs.set_reg(crate::regs::GprIndex::A0, 0);
+            ctx.guest_regs.sepc += 4;
+            ax_println!("Emulated: csrr a0, mhartid -> 0");
+            true
+        },
+        _ => false, // 无法模拟的指令
+    }
 }
 
 fn prepare_guest_context(ctx: &mut VmCpuRegisters) {
